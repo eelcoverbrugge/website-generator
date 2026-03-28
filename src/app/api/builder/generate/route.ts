@@ -4,6 +4,10 @@ import type { PageConfig } from '@/lib/builder/types'
 import { generatePageCode } from '@/lib/builder/codegen'
 
 export async function POST(request: Request) {
+  if (process.env.ENABLE_BUILDER !== 'true') {
+    return Response.json({ error: 'Not found' }, { status: 404 })
+  }
+
   const config: PageConfig = await request.json()
 
   if (!config.slug || !/^[a-z0-9][a-z0-9-]*$/.test(config.slug)) {

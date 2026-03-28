@@ -1,6 +1,22 @@
-import type { PageConfig, SectionConfig } from './types'
+import type { PageConfig, SectionConfig, SectionType } from './types'
 
-// Serialize a JS value to valid JSX-embeddable code
+// ─── Props die in de gegenereerde code naar client.config verwijzen ───────────
+// Als je het telefoonnummer in client.config aanpast, updaten alle gegenereerde
+// pagina's automatisch — zonder dat je ze opnieuw hoeft te genereren.
+const CLIENT_REFS: Partial<Record<SectionType, Record<string, string>>> = {
+  Navbar: {
+    logo:  'client.logo',
+    items: 'client.nav.items',
+    cta:   'client.nav.cta',
+  },
+  Footer: {
+    logo:      'client.logo',
+    contact:   'client.contact',
+    copyright: '`© ${new Date().getFullYear()} ${client.name}. Alle rechten voorbehouden.`',
+  },
+}
+
+// ─── Serialiseer een JS-waarde naar geldige JSX-code ─────────────────────────
 function valueToCode(val: unknown, depth = 0): string {
   const pad      = '  '.repeat(depth)
   const padInner = '  '.repeat(depth + 1)
@@ -26,13 +42,18 @@ function valueToCode(val: unknown, depth = 0): string {
   return JSON.stringify(val)
 }
 
-// Render one JSX element for a section
+// ─── Render één JSX-element voor een sectie ───────────────────────────────────
 function sectionToJSX(s: SectionConfig, baseIndent: string): string {
   const innerIndent = baseIndent + '  '
+  const refs = CLIENT_REFS[s.type] ?? {}
 
   const propLines = [
     `${innerIndent}variant="${s.variant}"`,
     ...Object.entries(s.props).map(([key, val]) => {
+      // Gebruik client config referentie als beschikbaar
+      const ref = refs[key]
+      if (ref) return `${innerIndent}${key}={${ref}}`
+      // Anders: serialiseer de waarde
       if (typeof val === 'string') return `${innerIndent}${key}=${JSON.stringify(val)}`
       return `${innerIndent}${key}={${valueToCode(val, (innerIndent.length / 2) + 1)}}`
     }),
@@ -41,11 +62,15 @@ function sectionToJSX(s: SectionConfig, baseIndent: string): string {
   return `${baseIndent}<${s.type}\n${propLines.join('\n')}\n${baseIndent}/>`
 }
 
+// ─── Genereer de volledige page.tsx broncode ──────────────────────────────────
 export function generatePageCode(config: PageConfig): string {
-  const usedTypes = [...new Set(config.sections.map(s => s.type))]
-  const imports = usedTypes
-    .map(t => `import { ${t} } from '@/components/organisms/${t}'`)
-    .join('\n')
+  const usedTypes   = [...new Set(config.sections.map(s => s.type))]
+  const usesClient  = config.sections.some(s => Object.keys(CLIENT_REFS[s.type] ?? {}).length > 0)
+
+  const imports = [
+    ...(usesClient ? ["import client from '@/../client.config'"] : []),
+    ...usedTypes.map(t => `import { ${t} } from '@/components/organisms/${t}'`),
+  ].join('\n')
 
   const navbars = config.sections.filter(s => s.type === 'Navbar')
   const footers = config.sections.filter(s => s.type === 'Footer')

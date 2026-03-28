@@ -1,3 +1,4 @@
+import client from '@/../client.config'
 import type { SectionType } from './types'
 
 export interface SectionMeta {
@@ -11,13 +12,10 @@ export const REGISTRY: Record<SectionType, SectionMeta> = {
     label: 'Navigatie',
     variants: ['default', 'centered', 'transparent', 'minimal'],
     defaultProps: {
-      logo: { src: '/next.svg', alt: 'Bedrijfsnaam', width: 120, height: 36 },
-      items: [
-        { label: 'Home',     href: '/' },
-        { label: 'Diensten', href: '/diensten' },
-        { label: 'Contact',  href: '/contact' },
-      ],
-      cta: { label: 'Gratis offerte', href: '/contact' },
+      // Logo, menu-items en CTA komen automatisch uit client.config
+      logo:        client.logo,
+      items:       client.nav.items,
+      cta:         client.nav.cta,
       currentPath: '/',
     },
   },
@@ -26,12 +24,12 @@ export const REGISTRY: Record<SectionType, SectionMeta> = {
     label: 'Hero',
     variants: ['default', 'centered', 'stacked', 'bold'],
     defaultProps: {
-      badge: 'Gratis adviesgesprek',
-      headline: 'Meer klanten, minder gedoe',
-      subtext: 'Wij bouwen websites die converteren. Snel, betaalbaar en op maat voor jouw bedrijf.',
+      badge:        'Gratis adviesgesprek',
+      headline:     'Meer klanten, minder gedoe',
+      subtext:      'Wij bouwen websites die converteren. Snel, betaalbaar en op maat voor jouw bedrijf.',
       primaryCTA:   { label: 'Gratis offerte aanvragen', href: '/contact' },
       secondaryCTA: { label: 'Bekijk ons werk',          href: '/portfolio' },
-      image: { src: '/next.svg', alt: 'Hero afbeelding' },
+      image:        { src: '/next.svg', alt: 'Hero afbeelding' },
     },
   },
 
@@ -39,8 +37,9 @@ export const REGISTRY: Record<SectionType, SectionMeta> = {
     label: 'Footer',
     variants: ['default', 'minimal', 'dark', 'newsletter'],
     defaultProps: {
-      logo: { src: '/next.svg', alt: 'Bedrijfsnaam', width: 120, height: 36 },
-      tagline: 'Wij helpen MKB groeien met slimme digitale oplossingen.',
+      // Logo, contact en copyright komen automatisch uit client.config
+      logo:      client.logo,
+      tagline:   'Wij helpen MKB groeien met slimme digitale oplossingen.',
       columns: [
         {
           heading: 'Diensten',
@@ -57,12 +56,8 @@ export const REGISTRY: Record<SectionType, SectionMeta> = {
           ],
         },
       ],
-      contact: {
-        address: 'Voorbeeldstraat 1, 1234 AB Amsterdam',
-        phone:   '020 123 4567',
-        email:   'info@bedrijf.nl',
-      },
-      copyright: `© ${new Date().getFullYear()} Bedrijfsnaam. Alle rechten voorbehouden.`,
+      contact:   client.contact,
+      copyright: `© ${new Date().getFullYear()} ${client.name}. Alle rechten voorbehouden.`,
     },
   },
 }
