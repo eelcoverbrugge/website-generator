@@ -1,0 +1,1 @@
+export { AboutStat } from './AboutStat'

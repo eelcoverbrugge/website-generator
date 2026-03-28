@@ -1,0 +1,1 @@
+export { AboutBody } from './AboutBody'

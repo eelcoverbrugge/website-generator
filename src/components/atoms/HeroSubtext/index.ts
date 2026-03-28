@@ -1,0 +1,1 @@
+export { HeroSubtext } from './HeroSubtext'
